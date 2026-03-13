@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* 白色、灰色系主题 */
+  --primary-white: #ffffff;
+  --primary-light: #f8f9fa;
+  --primary-gray-light: #e9ecef;
+  --primary-gray: #adb5bd;
+  --primary-gray-dark: #6c757d;
+  --primary-dark: #343a40;
+  
+  /* 辅助色 - 保持极简 */
+  --accent-blue: #4a90e2;
+  --accent-green: #28a745;
+  
+  /* UI元素 */
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --box-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 无障碍焦点样式 */
+:focus-visible {
+  outline: 2px solid var(--primary-gray-dark);
+  outline-offset: 2px;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-gray);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-gray-dark);
+}
+
+/* 通用按钮重置 */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+}
+
+/* 图片加载优化 */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 防止长文本溢出 */
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 屏幕阅读器仅可见 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

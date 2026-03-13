@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修复验证测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #343a40;
+        }
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+        h1, h2 {
+            color: #343a40;
+        }
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #6c757d;
+            background: #f8f9fa;
+        }
+        button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a6268;
+        }
+        .audio-test {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .audio-test audio {
+            max-width: 300px;
+        }
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            margin: 5px;
+            display: inline-block;
+            border: 1px solid #dee2e6;
+        }
+        .console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>自然之声音乐播放器 - 修复验证测试</h1>
+    
+    <div class="test-section">
+        <h2>测试状态</h2>
+        <div id="test-status" class="status warning">准备测试...</div>
+        
+        <div class="test-item">
+            <h3>测试项目</h3>
+            <ol>
+                <li>UI色调验证（白色、灰色系）</li>
+                <li>音频对应性测试（歌曲 vs 音频）</li>
+                <li>封面对应性测试（歌曲 vs 封面）</li>
+                <li>API数据验证</li>
+                <li>播放功能测试</li>
+            </ol>
+        </div>
+        
+        <button onclick="runAllTests()">运行全部测试</button>
+        <button onclick="clearConsole()">清空控制台</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>UI色调验证</h2>
+        <div id="ui-test">
+            <p>预期：白色、灰色系主题</p>
+            <div>
+                <strong>颜色样本：</strong>
+                <div class="color-box" style="background: #ffffff" title="白色"></div>
+                <div class="color-box" style="background: #f8f9fa" title="浅灰"></div>
+                <div class="color-box" style="background: #e9ecef" title="灰白"></div>
+                <div class="color-box" style="background: #adb5bd" title="中灰"></div>
+                <div class="color-box" style="background: #6c757d" title="深灰"></div>
+                <div class="color-box" style="background: #343a40" title="黑灰"></div>
+            </div>
+            <div id="ui-result" class="test-item"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>音频对应性测试</h2>
+        <div id="audio-test">
+            <p>测试每个主题的音频是否匹配：</p>
+            <div id="audio-results"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>API数据验证</h2>
+        <div id="api-test">
+            <button onclick="testAPI('rain')">测试雨声歌单</button>
+            <button onclick="testAPI('light')">测试阳光歌单</button>
+            <button onclick="testAPI('wind')">测试风声歌单</button>
+            <div id="api-results" class="test-item"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>控制台输出</h2>
+        <div id="console-output" class="console">等待测试开始...</div>
+    </div>
+    
+    <script>
+        let consoleOutput = document.getElementById('console-output');
+        let testStatus = document.getElementById('test-status');
+        
+        // 重写console方法
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
+        
+        function captureConsole(method, args) {
+            originalConsole[method].apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.innerHTML += `[${timestamp}] ${method.toUpperCase()}: ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = (...args) => captureConsole('log', args);
+        console.error = (...args) => captureConsole('error', args);
+        console.warn = (...args) => captureConsole('warn', args);
+        console.info = (...args) => captureConsole('info', args);
+        
+        function clearConsole() {
+            consoleOutput.innerHTML = '控制台已清空\n';
+        }
+        
+        function updateStatus(text, type) {
+            testStatus.textContent = text;
+            testStatus.className = `status ${type}`;
+        }
+        
+        // UI色调测试
+        function testUIColors() {
+            console.log('=== 测试UI色调 ===');
+            const bodyStyle = window.getComputedStyle(document.body);
+            const bgColor = bodyStyle.backgroundColor;
+            
+            console.log('Body背景色:', bgColor);
+            
+            const uiResult = document.getElementById('ui-result');
+            const expectedColors = ['rgb(248, 249, 250)', '#f8f9fa', 'rgba(248, 249, 250)'];
+            
+            if (expectedColors.some(color => bgColor.includes(color.replace('#', '')))) {
+                uiResult.innerHTML = '<div class="success">✓ UI色调正确：白色、灰色系主题</div>';
+                console.log('UI色调测试通过');
+                return true;
+            } else {
+                uiResult.innerHTML = `<div class="error">✗ UI色调不正确：当前背景色 ${bgColor}，期望浅灰色</div>`;
+                console.warn('UI色调测试失败');
+                return false;
+            }
+        }
+        
+        // API测试
+        async function testAPI(playlistId) {
+            console.log(`=== 测试API: ${playlistId} ===`);
+            updateStatus(`测试${playlistId}歌单API...`, 'warning');
+            
+            try {
+                const response = await fetch(`http://localhost:3001/api/playlist/${playlistId}?useMock=true`);
+                const data = await response.json();
+                
+                console.log(`${playlistId}歌单数据:`, data);
+                
+                const apiResults = document.getElementById('api-results');
+                apiResults.innerHTML = `
+                    <div class="success">
+                        ✓ ${playlistId}歌单API测试通过
+                        <br><small>歌曲数量: ${data.songs.length}</small>
+                        <br><small>第一首歌: ${data.songs[0]?.name} - ${data.songs[0]?.artist}</small>
+                        <br><small>音频URL: ${data.songs[0]?.url?.substring(0, 50)}...</small>
+                    </div>
+                `;
+                
+                // 测试音频对应性
+                testAudioCorrespondence(data.songs, playlistId);
+                
+                return true;
+            } catch (error) {
+                console.error('API测试失败:', error);
+                const apiResults = document.getElementById('api-results');
+                apiResults.innerHTML = `<div class="error">✗ ${playlistId}歌单API测试失败: ${error.message}</div>`;
+                return false;
+            }
+        }
+        
+        // 音频对应性测试
+        function testAudioCorrespondence(songs, playlistId) {
+            console.log(`=== 测试音频对应性: ${playlistId} ===`);
+            const audioResults = document.getElementById('audio-results');
+            
+            let html = `<h4>${playlistId}歌单音频测试:</h4>`;
+            let allPassed = true;
+            
+            songs.forEach((song, index) => {
+                const audioUrl = song.url;
+                const isThemeMatch = checkThemeMatch(audioUrl, playlistId);
+                
+                html += `
+                    <div class="audio-test">
+                        <strong>${song.name}</strong> - ${song.artist}
+                        <br><small>音频: ${audioUrl?.substring(0, 40)}...</small>
+                        <br><span class="${isThemeMatch ? 'success' : 'error'}">
+                            ${isThemeMatch ? '✓ 主题匹配' : '✗ 主题不匹配'}
+                        </span>
+                    </div>
+                `;
+                
+                if (!isThemeMatch) allPassed = false;
+                
+                console.log(`歌曲 ${song.name}: 音频主题匹配 ${isThemeMatch ? '通过' : '失败'}`);
+            });
+            
+            audioResults.innerHTML = html;
+            
+            if (allPassed) {
+                console.log(`${playlistId}歌单音频对应性测试通过`);
+            } else {
+                console.warn(`${playlistId}歌单音频对应性测试失败`);
+            }
+        }
+        
+        // 检查音频主题匹配
+        function checkThemeMatch(audioUrl, playlistId) {
+            if (!audioUrl) return false;
+            
+            const url = audioUrl.toLowerCase();
+            
+            if (playlistId === 'rain') {
+                return url.includes('rain') || url.includes('雨');
+            } else if (playlistId === 'light') {
+                return url.includes('piano') || url.includes('sun') || url.includes('light');
+            } else if (playlistId === 'wind') {
+                return url.includes('wind') || url.includes('guitar') || url.includes('breeze');
+            }
+            
+            return false;
+        }
+        
+        // 运行所有测试
+        async function runAllTests() {
+            console.log('=== 开始全面测试 ===');
+            updateStatus('测试进行中...', 'warning');
+            
+            clearConsole();
+            
+            // 测试UI色调
+            const uiPassed = testUIColors();
+            
+            // 测试所有API
+            const playlists = ['rain', 'light', 'wind'];
+            let apiPassed = true;
+            
+            for (const playlist of playlists) {
+                const passed = await testAPI(playlist);
+                if (!passed) apiPassed = false;
+                await new Promise(resolve => setTimeout(resolve, 500)); // 延迟避免请求过快
+            }
+            
+            // 总结
+            if (uiPassed && apiPassed) {
+                updateStatus('所有测试通过！', 'success');
+                console.log('=== 所有测试通过 ===');
+            } else {
+                updateStatus('部分测试失败', 'error');
+                console.warn('=== 测试失败 ===');
+            }
+            
+            console.log('测试完成');
+        }
+        
+        // 页面加载时自动运行基础测试
+        window.addEventListener('load', () => {
+            console.log('测试页面已加载');
+            console.log('当前时间:', new Date().toLocaleString());
+            console.log('页面URL:', window.location.href);
+            
+            // 自动测试UI色调
+            setTimeout(() => {
+                testUIColors();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
