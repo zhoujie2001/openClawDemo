@@ -5,8 +5,8 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // 🔴 GitHub Pages 部署需要设置 base 路径
-  base: process.env.NODE_ENV === 'production' ? '/openClawDemo/' : '/',
+  // 🔴 GitHub Pages 部署在仓库根目录，使用相对路径
+  base: './',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
