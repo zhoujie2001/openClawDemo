@@ -7,31 +7,27 @@ function Playlists() {
   const [playlists, setPlaylists] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  // 🔴 强制使用 Mock 数据（生产环境无后端支持）
   const [useMock, setUseMock] = useState(true)
   const [currentPlaylist, setCurrentPlaylist] = useState(null)
 
   useEffect(() => {
+    // 立即加载 Mock 数据
     loadPlaylists()
-  }, [useMock])
+  }, []) // 移除 useMock 依赖，避免循环调用
 
   const loadPlaylists = async () => {
     try {
       setLoading(true)
       setError(null)
       
-      const data = await PlaylistService.getAll(useMock)
+      console.log('🦞 加载播放列表 (Mock 模式)...')
+      const data = await PlaylistService.getAll(true) // 强制使用 Mock
       setPlaylists(data)
+      console.log('✅ 播放列表加载成功:', data.length, '个')
     } catch (err) {
-      console.error('加载播放列表失败:', err)
+      console.error('❌ 加载播放列表失败:', err)
       setError(err.message || '加载失败')
-      
-      // 如果真实 API 失败，尝试使用 Mock
-      if (!useMock) {
-        console.log('🔄 切换到 Mock 数据...')
-        setUseMock(true)
-        const mockData = await PlaylistService.getAll(true)
-        setPlaylists(mockData)
-      }
     } finally {
       setLoading(false)
     }
@@ -47,17 +43,19 @@ function Playlists() {
       <h2>🎵 白噪音播放列表</h2>
       <p className="section-description">精选高品质白噪音，助您放松身心</p>
       
-      <div className="toggle-container">
+      {/* 🔴 隐藏 API 切换开关，强制使用 Mock */}
+      <div className="toggle-container" style={{ opacity: 0.6 }}>
         <label className="toggle-switch">
           <input 
             type="checkbox" 
             checked={useMock} 
             onChange={(e) => setUseMock(e.target.checked)}
+            disabled
           />
           <span className="toggle-slider"></span>
         </label>
         <span className="toggle-label">
-          {useMock ? '✅ 使用 Mock 数据' : '🔌 连接真实 API'}
+          ✅ 使用 Mock 数据 (Demo 模式)
         </span>
       </div>
 

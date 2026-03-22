@@ -1,6 +1,6 @@
 /**
  * Playlist Service - 播放列表服务
- * 提供 Mock 数据和真实 API 调用
+ * 🔴 注意：当前仅支持 Mock 数据模式（无后端 API）
  */
 
 const MOCK_PLAYLISTS = [
@@ -63,55 +63,30 @@ const MOCK_PLAYLISTS = [
 class PlaylistService {
   /**
    * 获取所有播放列表
-   * @param {boolean} useMock - 是否使用 Mock 数据
+   * 🔴 强制使用 Mock 数据（生产环境无后端支持）
+   * @param {boolean} useMock - 此参数已废弃，始终返回 Mock 数据
    * @returns {Promise<Array>} 播放列表数组
    */
   async getAll(useMock = true) {
-    if (useMock) {
-      return this.getMockPlaylists()
-    }
-    
-    try {
-      const response = await fetch('/api/playlist?useMock=false')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return await response.json()
-    } catch (error) {
-      console.warn('API 调用失败，切换到 Mock 数据:', error)
-      return this.getMockPlaylists()
-    }
+    // 🔴 无论参数如何，始终返回 Mock 数据
+    console.log('🦞 [PlaylistService] 使用 Mock 数据加载播放列表')
+    return this.getMockPlaylists()
   }
 
   /**
    * 根据 ID 获取单个播放列表
+   * 🔴 强制使用 Mock 数据
    * @param {string} id - 播放列表 ID
-   * @param {boolean} useMock - 是否使用 Mock 数据
+   * @param {boolean} useMock - 此参数已废弃
    * @returns {Promise<Object>} 播放列表对象
    */
   async getById(id, useMock = true) {
-    if (useMock) {
-      const playlist = MOCK_PLAYLISTS.find(p => p.id === id)
-      if (!playlist) {
-        throw new Error(`播放列表 ${id} 不存在`)
-      }
-      return playlist
+    // 🔴 始终使用 Mock 数据
+    const playlist = MOCK_PLAYLISTS.find(p => p.id === id)
+    if (!playlist) {
+      throw new Error(`播放列表 ${id} 不存在`)
     }
-    
-    try {
-      const response = await fetch(`/api/playlist/${id}?useMock=false`)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return await response.json()
-    } catch (error) {
-      console.warn('API 调用失败，切换到 Mock 数据:', error)
-      const playlist = MOCK_PLAYLISTS.find(p => p.id === id)
-      if (!playlist) {
-        throw new Error(`播放列表 ${id} 不存在`)
-      }
-      return playlist
-    }
+    return playlist
   }
 
   /**
@@ -119,7 +94,7 @@ class PlaylistService {
    * @returns {Array} Mock 数据
    */
   getMockPlaylists() {
-    console.log('🦞 使用 Mock 数据加载播放列表')
+    console.log('🦞 [PlaylistService] 返回 Mock 数据:', MOCK_PLAYLISTS.length, '个播放列表')
     // 模拟网络延迟
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -134,7 +109,7 @@ class PlaylistService {
    * @returns {Promise<Array>} 匹配的播放列表
    */
   async search(query) {
-    const allPlaylists = await this.getAll(true)
+    const allPlaylists = await this.getAll() // 强制使用 Mock
     return allPlaylists.filter(playlist => 
       playlist.name.toLowerCase().includes(query.toLowerCase()) ||
       playlist.description.toLowerCase().includes(query.toLowerCase())
