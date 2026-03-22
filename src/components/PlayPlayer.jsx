@@ -126,20 +126,22 @@ function PlayPlayer({ playlist }) {
 
   return (
     <div className="play-player">
-      <audio
-        ref={audioRef}
-        src={`/api/audio/${playlist.id}`}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
-      />
+      {/* 注意：真实音频功能需要后端 API 支持 (/api/audio/:id) */}
+      {/* 当前处于 Demo 模式，仅展示 UI 界面 */}
+      
+      <div className="player-placeholder">
+        <div className="placeholder-icon">🎵</div>
+        <h3>Demo 模式</h3>
+        <p>音频播放功能需要后端 API 支持</p>
+        <p className="hint">这是演示界面的预览，真实音频将在后端部署后启用</p>
+      </div>
 
       <div className="player-header">
         <div className="playlist-info">
           <span className="playlist-icon">{playlist.icon}</span>
           <span className="playlist-name">{playlist.name}</span>
         </div>
-        {isPlaying && <span className="playing-indicator">●</span>}
+        <span className="demo-badge">🔴 Demo</span>
       </div>
 
       <div className="player-controls">
@@ -147,35 +149,37 @@ function PlayPlayer({ playlist }) {
           className="btn-play-large" 
           onClick={togglePlay}
           aria-label={isPlaying ? '暂停' : '播放'}
+          disabled
+          title="Demo 模式：音频功能暂未启用"
         >
-          {isPlaying ? '⏸️' : '▶️'}
+          ⏸️
         </button>
       </div>
 
       <div className="player-progress">
-        <span className="time-current">{formatTime(currentTime)}</span>
+        <span className="time-current">0:00</span>
         <input
           type="range"
           min="0"
-          max={duration || 0}
-          value={currentTime}
-          onChange={handleSeek}
+          max="100"
+          value="0"
+          disabled
           className="progress-bar"
         />
-        <span className="time-total">{formatTime(duration)}</span>
+        <span className="time-total">0:00</span>
       </div>
 
       <div className="player-volume">
-        <button className="btn-mute" onClick={toggleMute} aria-label={isMuted ? '静音' : '取消静音'}>
-          {isMuted ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+        <button className="btn-mute" disabled>
+          🔇
         </button>
         <input
           type="range"
           min="0"
           max="1"
           step="0.1"
-          value={isMuted ? 0 : volume}
-          onChange={handleVolumeChange}
+          value="0"
+          disabled
           className="volume-bar"
         />
       </div>
